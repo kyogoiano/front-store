@@ -3,11 +3,14 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment'
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { Product } from '../model/Product';
 @Injectable({
   providedIn: 'root'
 })
+
+@Injectable()
 export class CartService {
-  items = [];
+  items = Array<Product>()
 
   private apiUrl : string;
 
@@ -18,44 +21,25 @@ export class CartService {
     this.apiUrl = URL = ( <any> environment).apiBase || "";
   }
 
-  addToCart(product) {
+  addToCart(product: Product) {
     this.items.push(product);
   }
 
-  list() : Observable<Product[]>{
-    return this.http.get<Product[]>(this.apiUrl + '/');
+  list() : Promise<Product[]>{
+    return this.http.get<Product[]>(this.apiUrl + '/').toPromise();
   }
 
-  get(title) : Observable<Product> {
-    if(!title || title === "new") {
-      return from([
-        <Product>{
-          title: null,
-          name: "",
-          tags: [],
-          photoUrls: [],
-          category: {
-            id: null,
-            name: ""
-          },
-          status: "AVAILABLE"
-        }]
-      )
-    }
+  get(title: String) : Observable<Product> {
     return this.http.get<Product>(this.apiUrl + '/title/' + title);
   }
 
-  create(product) : Observable<Product> {
+  create(product: Product) : Observable<Product> {
     return this.http.post<Product>(this.apiUrl + '/', product, this.getHeader());
   }
 
   clearCart() {
     this.items = [];
     return this.items;
-  }
-
-  getShippingPrices() {
-    return this.http.get('/assets/shipping.json');
   }
 
   private getHeader(){

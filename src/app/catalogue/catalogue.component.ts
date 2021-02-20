@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-
+import { HttpClient } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core'; 
+import { Product } from '../model/Product';
+import { CartService } from './catalogue.service';
 @Component({
   selector: 'app-catalogue',
   templateUrl: './catalogue.component.html',
@@ -7,12 +9,26 @@ import { Component, OnInit } from '@angular/core';
 })
 export class CatalogueComponent implements OnInit {
 
-  constructor() { }
+  public products: Product[] = [];
 
-  ngOnInit(): void {
+  constructor(  
+    private cartService: CartService
+  ){
+
   }
 
-  products = getAll;
+  ngOnInit(): void {
+    this.getAllProducts()
+  }
+
+
+  async getAllProducts(){
+    await this.cartService.list().then(
+      data => {
+        this.products = data
+      }
+    )
+  }
 
   share() {
     window.alert('The product has been shared!');
